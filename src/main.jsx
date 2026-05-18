@@ -6,6 +6,6 @@ import Analyser from './Analyser.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Analyser />
   </StrictMode>,
 )
