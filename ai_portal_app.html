@@ -1,0 +1,705 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0f1117;--bg2:#161b27;--bg3:#1e2538;--bg4:#252d42;
+    --border:#2a334d;--border2:#3a4666;
+    --text:#e8ecf4;--text2:#8891aa;--text3:#525c78;
+    --accent:#4f8ef7;--accent2:#3a6fd6;--accent-bg:rgba(79,142,247,0.12);
+    --green:#34d399;--green-bg:rgba(52,211,153,0.1);
+    --amber:#fbbf24;--amber-bg:rgba(251,191,36,0.1);
+    --red:#f87171;--red-bg:rgba(248,113,113,0.1);
+    --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.1);
+    --radius:10px;--radius-lg:14px;
+    --font:'DM Sans',sans-serif;--mono:'Space Mono',monospace;
+  }
+  body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:600px}
+
+  /* Login */
+  .login-wrap{display:flex;align-items:center;justify-content:center;min-height:600px;background:var(--bg)}
+  .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 36px;width:360px}
+  .login-logo{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:8px}
+  .login-logo span{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+  .login-h{font-size:20px;font-weight:600;margin-bottom:4px}
+  .login-sub{color:var(--text2);font-size:13px;margin-bottom:28px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+  .field input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border .2s}
+  .field input:focus{border-color:var(--accent)}
+  .btn-primary{width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);padding:11px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s}
+  .btn-primary:hover{background:var(--accent2)}
+  .login-err{background:var(--red-bg);border:1px solid rgba(248,113,113,.3);border-radius:var(--radius);padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:16px;display:none}
+
+  /* App shell */
+  .app{display:flex;min-height:600px}
+  .sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+  .sidebar-logo{padding:20px 18px;font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:2px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .sidebar-logo span{width:24px;height:24px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+  .nav{flex:1;padding:12px 10px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;font-weight:400;transition:all .15s;margin-bottom:2px}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:var(--accent-bg);color:var(--accent)}
+  .nav-icon{font-size:16px;width:18px;text-align:center}
+  .sidebar-user{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .user-av{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+  .user-name{font-size:12px;font-weight:500}
+  .user-role{font-size:11px;color:var(--text3)}
+  .btn-logout{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px}
+  .btn-logout:hover{color:var(--red)}
+
+  /* Main */
+  .main{flex:1;overflow:auto;background:var(--bg)}
+  .page{padding:28px 32px;display:none}
+  .page.active{display:block}
+  .page-header{margin-bottom:24px}
+  .page-title{font-size:20px;font-weight:600;margin-bottom:4px}
+  .page-sub{color:var(--text2);font-size:13px}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text);transition:all .15s}
+  .btn:hover{background:var(--bg4);border-color:var(--border2)}
+  .btn-blue{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-blue:hover{background:var(--accent2);border-color:var(--accent2)}
+  .btn-sm{padding:5px 11px;font-size:12px}
+  .btn-ghost{background:none;border-color:transparent;color:var(--text2)}
+  .btn-ghost:hover{background:var(--bg3);color:var(--text)}
+  .btn-danger{background:var(--red-bg);border-color:rgba(248,113,113,.3);color:var(--red)}
+
+  /* Cards */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+  .card-sm{padding:14px 16px}
+
+  /* Tables */
+  .table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:var(--bg3)}
+  th{padding:11px 16px;text-align:left;font-size:11px;font-weight:500;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--bg2)}
+
+  /* Badge */
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+  .badge-green{background:var(--green-bg);color:var(--green)}
+  .badge-amber{background:var(--amber-bg);color:var(--amber)}
+  .badge-red{background:var(--red-bg);color:var(--red)}
+  .badge-blue{background:var(--accent-bg);color:var(--accent)}
+  .badge-purple{background:var(--purple-bg);color:var(--purple)}
+
+  /* Stats row */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+  .stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .stat-val{font-size:22px;font-weight:600}
+  .stat-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+  /* Excel Analyser */
+  .analyser-steps{display:flex;align-items:center;gap:0;margin-bottom:28px}
+  .step{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:500;color:var(--text3)}
+  .step.done{color:var(--green)}
+  .step.active{background:var(--accent-bg);color:var(--accent)}
+  .step-num{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+  .step-sep{width:28px;height:1px;background:var(--border)}
+
+  .upload-zone{border:1.5px dashed var(--border2);border-radius:var(--radius-lg);padding:40px;text-align:center;cursor:pointer;transition:all .2s}
+  .upload-zone:hover{border-color:var(--accent);background:var(--accent-bg)}
+  .upload-icon{font-size:32px;margin-bottom:12px;color:var(--text3)}
+  .upload-label{font-size:14px;color:var(--text2);margin-bottom:4px}
+  .upload-hint{font-size:12px;color:var(--text3)}
+
+  .q-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+  .q-item:last-child{border-bottom:none}
+  .q-num{font-family:var(--mono);font-size:11px;color:var(--text3);min-width:24px}
+  .q-text{flex:1;font-size:13px}
+  .q-edit{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px}
+  .q-edit:hover{color:var(--accent)}
+  .q-input{flex:1;background:var(--bg3);border:1px solid var(--accent);border-radius:6px;padding:6px 10px;color:var(--text);font-family:var(--font);font-size:13px;outline:none}
+
+  .ans-row{display:grid;grid-template-columns:1fr 1.2fr;gap:16px;align-items:start;padding:12px 0;border-bottom:1px solid var(--border)}
+  .ans-row:last-child{border-bottom:none}
+  .ans-q{font-size:12px;color:var(--text2);line-height:1.5}
+  .ans-val{font-size:13px;line-height:1.5}
+  .ans-edit{width:100%;background:var(--bg3);border:1px solid var(--accent);border-radius:6px;padding:7px 10px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;resize:none}
+  .confidence{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--text3);margin-top:4px}
+  .conf-bar{height:3px;border-radius:2px;background:var(--green)}
+
+  /* Jobs */
+  .job-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;display:flex;align-items:center;gap:16px;margin-bottom:12px;cursor:pointer;transition:all .15s}
+  .job-card:hover{border-color:var(--border2);background:var(--bg3)}
+  .job-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .job-info{flex:1}
+  .job-name{font-size:14px;font-weight:500;margin-bottom:3px}
+  .job-meta{font-size:12px;color:var(--text2)}
+  .job-prog{width:100px}
+  .prog-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:4px}
+  .prog-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .4s}
+
+  /* Detail */
+  .detail-header{display:flex;align-items:flex-start;gap:20px;margin-bottom:28px}
+  .detail-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+  .detail-title{font-size:20px;font-weight:600;margin-bottom:6px}
+  .detail-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .meta-item{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px}
+  .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
+  .info-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+  .info-key{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .info-val{font-size:14px;font-weight:500}
+  .timeline{position:relative;padding-left:20px}
+  .tl-item{position:relative;padding:0 0 18px 20px;border-left:1.5px solid var(--border)}
+  .tl-item:last-child{border-left-color:transparent}
+  .tl-dot{position:absolute;left:-6px;top:2px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+  .tl-dot.done{background:var(--green)}
+  .tl-dot.pending{background:var(--border)}
+  .tl-title{font-size:13px;font-weight:500;margin-bottom:2px}
+  .tl-time{font-size:11px;color:var(--text3)}
+
+  /* Chat panel */
+  .chat-wrap{display:flex;flex-direction:column;height:500px}
+  .chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:75%;line-height:1.6;font-size:13px;padding:11px 14px;border-radius:12px}
+  .msg-user{background:var(--accent);color:#fff;align-self:flex-end;border-radius:12px 12px 2px 12px}
+  .msg-ai{background:var(--bg3);color:var(--text);align-self:flex-start;border-radius:12px 12px 12px 2px;border:1px solid var(--border)}
+  .msg-label{font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;color:var(--text3)}
+  .chat-input-row{display:flex;gap:10px;padding:16px;border-top:1px solid var(--border)}
+  .chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border .2s}
+  .chat-input:focus{border-color:var(--accent)}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;width:420px;max-width:90vw}
+  .modal-title{font-size:16px;font-weight:600;margin-bottom:6px}
+  .modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+  .tab{padding:8px 16px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* Spinner */
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+
+  /* Notify */
+  .notify{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+  .notify.show{opacity:1}
+
+  .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}
+  .gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+  .mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}.mb-12{margin-bottom:12px}
+  .text-muted{color:var(--text2)}.text-sm{font-size:12px}.fw-500{font-weight:500}
+  .hidden{display:none}
+  input[type=file]{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo"><span>A</span>AI PORTAL</div>
+    <div class="login-h">Welcome back</div>
+    <div class="login-sub">Sign in to your AI analysis workspace</div>
+    <div class="login-err" id="loginErr">Invalid email or password</div>
+    <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="admin@company.com" value="admin@company.com"></div>
+    <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" value="password"></div>
+    <button class="btn-primary" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appView" class="app hidden">
+  <div class="sidebar">
+    <div class="sidebar-logo"><span>A</span>AI PORTAL</div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="nav('dashboard')"><span class="nav-icon">⊞</span>Dashboard</div>
+      <div class="nav-item" onclick="nav('analyser')"><span class="nav-icon">⊟</span>Excel Analyser</div>
+      <div class="nav-item" onclick="nav('jobs')"><span class="nav-icon">⊙</span>Document Jobs</div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-av">AD</div>
+      <div><div class="user-name">Admin User</div><div class="user-role">Analyst</div></div>
+      <button class="btn-logout" onclick="doLogout()" title="Logout">⏻</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div class="page active" id="pageDashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Overview of your AI analysis workspace</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Total Jobs</div><div class="stat-val">24</div><div class="stat-sub">+3 this week</div></div>
+        <div class="stat"><div class="stat-label">Completed</div><div class="stat-val" style="color:var(--green)">18</div><div class="stat-sub">75% success rate</div></div>
+        <div class="stat"><div class="stat-label">Processing</div><div class="stat-val" style="color:var(--amber)">4</div><div class="stat-sub">~12 min avg</div></div>
+        <div class="stat"><div class="stat-label">Answers Found</div><div class="stat-val" style="color:var(--accent)">342</div><div class="stat-sub">Across all jobs</div></div>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-between mb-16">
+          <div class="fw-500">Recent Jobs</div>
+          <button class="btn btn-sm" onclick="nav('jobs')">View all →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Document</th><th>Status</th><th>Questions</th><th>Answers</th><th>Updated</th></tr></thead>
+            <tbody>
+              <tr><td>Q4_Financial_Report.xlsx</td><td><span class="badge badge-green">● Complete</span></td><td>18</td><td>18</td><td>2 hrs ago</td></tr>
+              <tr><td>Vendor_Contract_2025.pdf</td><td><span class="badge badge-amber">◌ Processing</span></td><td>12</td><td>7</td><td>14 min ago</td></tr>
+              <tr><td>Compliance_Checklist.docx</td><td><span class="badge badge-green">● Complete</span></td><td>24</td><td>24</td><td>1 day ago</td></tr>
+              <tr><td>Market_Research_2025.xlsx</td><td><span class="badge badge-red">✕ Failed</span></td><td>8</td><td>0</td><td>2 days ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXCEL ANALYSER -->
+    <div class="page hidden" id="pageAnalyser">
+      <div class="page-header flex items-center justify-between">
+        <div>
+          <div class="page-title">Excel Analyser</div>
+          <div class="page-sub">Upload a document, extract questions and find answers via RAG</div>
+        </div>
+      </div>
+
+      <div class="analyser-steps mb-20">
+        <div class="step done" id="st1"><div class="step-num">✓</div>Upload</div>
+        <div class="step-sep"></div>
+        <div class="step active" id="st2"><div class="step-num">2</div>Questions</div>
+        <div class="step-sep"></div>
+        <div class="step" id="st3"><div class="step-num">3</div>Answers</div>
+        <div class="step-sep"></div>
+        <div class="step" id="st4"><div class="step-num">4</div>Export</div>
+      </div>
+
+      <!-- Step 1: Upload -->
+      <div id="aStep1">
+        <div class="upload-zone" onclick="document.getElementById('fileIn').click()">
+          <input type="file" id="fileIn" accept=".xlsx,.xls,.csv,.pdf,.docx" onchange="handleUpload(this)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-label">Drop your document here or click to browse</div>
+          <div class="upload-hint">.xlsx · .xls · .csv · .pdf · .docx supported</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Questions -->
+      <div id="aStep2" class="hidden">
+        <div class="card mb-16">
+          <div class="flex items-center justify-between mb-16">
+            <div>
+              <div class="fw-500 mb-12" style="margin-bottom:2px">Extracted Questions</div>
+              <div class="text-sm text-muted" id="qFileLabel"></div>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-sm" onclick="addQuestion()">+ Add Question</button>
+              <button class="btn btn-sm btn-blue" onclick="openSystemModal()">Find Answers →</button>
+            </div>
+          </div>
+          <div id="questionList"></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Answers -->
+      <div id="aStep3" class="hidden">
+        <div class="card mb-16">
+          <div class="flex items-center justify-between mb-16">
+            <div>
+              <div class="fw-500" style="margin-bottom:2px">Answers Found</div>
+              <div class="text-sm text-muted">System: <span id="systemNameLabel" style="color:var(--accent)"></span></div>
+            </div>
+            <div class="flex gap-8">
+              <button class="btn btn-sm" onclick="showStep(2)">← Back</button>
+              <button class="btn btn-sm btn-blue" onclick="exportExcel()">⬇ Export Excel</button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-sm text-muted mb-16" style="padding:0 0 12px;border-bottom:1px solid var(--border)">
+            <span>Question</span><span>Answer (click to edit)</span>
+          </div>
+          <div id="answerList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOBS -->
+    <div class="page hidden" id="pageJobs">
+      <div class="page-header flex items-center justify-between">
+        <div><div class="page-title">Document Jobs</div><div class="page-sub">Track all uploaded documents and processing status</div></div>
+        <button class="btn btn-blue" onclick="openNewJobModal()">+ New Job</button>
+      </div>
+      <div class="flex gap-8 mb-20">
+        <button class="btn btn-sm active" id="filterAll" onclick="filterJobs('all')">All (6)</button>
+        <button class="btn btn-sm btn-ghost" id="filterRunning" onclick="filterJobs('running')">Running (2)</button>
+        <button class="btn btn-sm btn-ghost" id="filterDone" onclick="filterJobs('done')">Complete (3)</button>
+        <button class="btn btn-sm btn-ghost" id="filterFailed" onclick="filterJobs('failed')">Failed (1)</button>
+      </div>
+      <div id="jobList"></div>
+    </div>
+
+    <!-- DOCUMENT DETAIL -->
+    <div class="page hidden" id="pageDetail">
+      <div class="page-header">
+        <button class="btn btn-sm btn-ghost mb-16" onclick="nav('jobs')">← Back to Jobs</button>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: System Name -->
+<div class="modal-overlay" id="systemModal">
+  <div class="modal">
+    <div class="modal-title">Select System</div>
+    <div class="modal-sub">Enter the system name to query against the RAG knowledge base</div>
+    <div class="field"><label>System Name</label><input type="text" id="systemNameInput" placeholder="e.g. ERP_System, SAP_2024, Oracle_HCM"></div>
+    <div class="flex gap-8" style="justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="closeModal('systemModal')">Cancel</button>
+      <button class="btn btn-blue" onclick="runRAG()"><span id="ragSpinner" class="spinner hidden"></span> Continue & Find Answers</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Job -->
+<div class="modal-overlay" id="newJobModal">
+  <div class="modal">
+    <div class="modal-title">Upload New Document</div>
+    <div class="modal-sub">Add a document to the processing queue</div>
+    <div class="field"><label>Document Name</label><input type="text" id="newJobName" placeholder="e.g. Q1_Report_2025.xlsx"></div>
+    <div class="field"><label>Document Type</label>
+      <select id="newJobType" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none">
+        <option>Excel (.xlsx)</option><option>PDF (.pdf)</option><option>Word (.docx)</option><option>CSV (.csv)</option>
+      </select>
+    </div>
+    <div class="flex gap-8" style="justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="closeModal('newJobModal')">Cancel</button>
+      <button class="btn btn-blue" onclick="createJob()">Add to Queue</button>
+    </div>
+  </div>
+</div>
+
+<div class="notify" id="notify"></div>
+
+<script>
+const JOBS = [
+  {id:1,name:'Q4_Financial_Report.xlsx',type:'Excel',status:'done',progress:100,questions:18,answers:18,size:'2.4 MB',created:'May 22, 2026',updated:'2 hrs ago',pages:42,system:'SAP_Finance',timeline:[{title:'Uploaded',time:'May 22, 9:01 AM',done:true},{title:'Text extracted',time:'May 22, 9:02 AM',done:true},{title:'Questions identified',time:'May 22, 9:04 AM',done:true},{title:'RAG query completed',time:'May 22, 9:08 AM',done:true},{title:'Answers exported',time:'May 22, 9:10 AM',done:true}]},
+  {id:2,name:'Vendor_Contract_2025.pdf',type:'PDF',status:'running',progress:58,questions:12,answers:7,size:'1.1 MB',created:'May 24, 2026',updated:'14 min ago',pages:18,system:'Oracle_Legal',timeline:[{title:'Uploaded',time:'May 24, 10:00 AM',done:true},{title:'Text extracted',time:'May 24, 10:01 AM',done:true},{title:'Questions identified',time:'May 24, 10:03 AM',done:true},{title:'RAG query in progress',time:'Running...',done:false},{title:'Export',time:'Pending',done:false}]},
+  {id:3,name:'Compliance_Checklist.docx',type:'Word',status:'done',progress:100,questions:24,answers:24,size:'0.8 MB',created:'May 23, 2026',updated:'1 day ago',pages:8,system:'ERP_Compliance',timeline:[{title:'Uploaded',time:'May 23, 2:00 PM',done:true},{title:'Text extracted',time:'May 23, 2:01 PM',done:true},{title:'Questions identified',time:'May 23, 2:03 PM',done:true},{title:'RAG query completed',time:'May 23, 2:11 PM',done:true},{title:'Answers exported',time:'May 23, 2:13 PM',done:true}]},
+  {id:4,name:'Market_Research_2025.xlsx',type:'Excel',status:'failed',progress:30,questions:8,answers:0,size:'3.7 MB',created:'May 21, 2026',updated:'2 days ago',pages:56,system:'BI_Platform',timeline:[{title:'Uploaded',time:'May 21, 4:00 PM',done:true},{title:'Text extracted',time:'May 21, 4:02 PM',done:true},{title:'Questions identified',time:'Failed',done:false},{title:'RAG query',time:'Pending',done:false},{title:'Export',time:'Pending',done:false}]},
+  {id:5,name:'HR_Policy_Manual.pdf',type:'PDF',status:'running',progress:75,questions:31,answers:22,size:'5.2 MB',created:'May 24, 2026',updated:'5 min ago',pages:88,system:'HCM_System',timeline:[{title:'Uploaded',time:'May 24, 9:30 AM',done:true},{title:'Text extracted',time:'May 24, 9:32 AM',done:true},{title:'Questions identified',time:'May 24, 9:36 AM',done:true},{title:'RAG query in progress',time:'Running...',done:false},{title:'Export',time:'Pending',done:false}]},
+  {id:6,name:'Audit_Report_2024.xlsx',type:'Excel',status:'done',progress:100,questions:15,answers:15,size:'1.9 MB',created:'May 20, 2026',updated:'4 days ago',pages:28,system:'Audit_Suite',timeline:[{title:'Uploaded',time:'May 20, 11:00 AM',done:true},{title:'Text extracted',time:'May 20, 11:01 AM',done:true},{title:'Questions identified',time:'May 20, 11:04 AM',done:true},{title:'RAG query completed',time:'May 20, 11:12 AM',done:true},{title:'Answers exported',time:'May 20, 11:14 AM',done:true}]},
+];
+
+let questions = [
+  "What is the total revenue for Q4 2024?",
+  "What are the top 3 expense categories?",
+  "What is the net profit margin?",
+  "Are there any budget variances exceeding 10%?",
+  "What is the YoY growth rate?",
+  "Which department had the highest spend?",
+];
+let answers = {};
+let editingQ = null;
+let currentJobFilter = 'all';
+
+function doLogin(){
+  const e=document.getElementById('loginEmail').value;
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  if(e==='admin@company.com'&&p==='password'){
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    err.style.display='none';
+  } else {
+    err.style.display='block';
+  }
+}
+function doLogout(){
+  document.getElementById('appView').classList.add('hidden');
+  document.getElementById('loginView').classList.remove('hidden');
+}
+document.getElementById('loginEmail').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+function nav(page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const idx={dashboard:0,analyser:1,jobs:2,detail:2};
+  document.querySelectorAll('.nav-item')[idx[page]||0].classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+page.charAt(0).toUpperCase()+page.slice(1)).classList.add('active');
+  if(page==='jobs') renderJobs();
+}
+
+function handleUpload(input){
+  if(!input.files.length) return;
+  const name=input.files[0].name;
+  document.getElementById('qFileLabel').textContent='File: '+name;
+  renderQuestions();
+  showStep(2);
+  setStep(2);
+}
+
+function showStep(n){
+  ['aStep1','aStep2','aStep3'].forEach((s,i)=>{
+    document.getElementById(s).classList.toggle('hidden', i+1!==n);
+  });
+}
+function setStep(n){
+  [1,2,3,4].forEach(i=>{
+    const el=document.getElementById('st'+i);
+    el.className='step'+(i<n?' done':i===n?' active':'');
+    el.children[0].textContent=i<n?'✓':i;
+  });
+}
+
+function renderQuestions(){
+  const list=document.getElementById('questionList');
+  list.innerHTML=questions.map((q,i)=>`
+    <div class="q-item" id="qi${i}">
+      <span class="q-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="q-text" id="qt${i}">${q}</span>
+      <button class="q-edit" onclick="editQ(${i})" title="Edit">✎</button>
+      <button class="q-edit" onclick="deleteQ(${i})" title="Delete" style="color:var(--red)">✕</button>
+    </div>
+  `).join('');
+}
+
+function editQ(i){
+  if(editingQ!==null) saveQ(editingQ);
+  editingQ=i;
+  const row=document.getElementById('qi'+i);
+  row.querySelector('.q-text').style.display='none';
+  const inp=document.createElement('input');
+  inp.className='q-input';inp.value=questions[i];inp.id='qinp'+i;
+  inp.onkeydown=e=>{if(e.key==='Enter')saveQ(i);if(e.key==='Escape'){editingQ=null;renderQuestions();}};
+  row.insertBefore(inp,row.querySelector('.q-edit'));
+  inp.focus();
+}
+function saveQ(i){
+  const inp=document.getElementById('qinp'+i);
+  if(inp) questions[i]=inp.value;
+  editingQ=null;renderQuestions();
+}
+function deleteQ(i){questions.splice(i,1);renderQuestions();}
+function addQuestion(){
+  questions.push('New question — click to edit');
+  renderQuestions();
+  setTimeout(()=>editQ(questions.length-1),50);
+}
+
+function openSystemModal(){document.getElementById('systemModal').classList.add('open');document.getElementById('systemNameInput').focus();}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+function runRAG(){
+  const sys=document.getElementById('systemNameInput').value.trim();
+  if(!sys){document.getElementById('systemNameInput').style.borderColor='var(--red)';return;}
+  document.getElementById('systemNameInput').style.borderColor='';
+  const sp=document.getElementById('ragSpinner');sp.classList.remove('hidden');
+  setTimeout(()=>{
+    sp.classList.add('hidden');
+    closeModal('systemModal');
+    document.getElementById('systemNameLabel').textContent=sys;
+    const sampleAnswers={
+      0:'Total revenue for Q4 2024 was $4.82 million, representing a 12.3% increase over Q3.',
+      1:'Top 3 expense categories: (1) Personnel costs at 42%, (2) Technology infrastructure at 18%, (3) Marketing at 11%.',
+      2:'Net profit margin stands at 18.7%, up from 16.2% in the same period last year.',
+      3:'Two departments reported budget variances exceeding 10%: R&D (+14.2%) and Sales (+11.8%).',
+      4:'Year-over-year growth rate is 23.4%, driven primarily by new enterprise contracts.',
+      5:'Engineering department recorded the highest spend at $1.1M, primarily on headcount expansion.',
+    };
+    answers={};
+    questions.forEach((q,i)=>{answers[i]=sampleAnswers[i]||'No matching answer found in '+sys+' knowledge base. Please review manually.'});
+    renderAnswers();
+    showStep(3);setStep(3);
+  },1800);
+}
+
+function renderAnswers(){
+  const list=document.getElementById('answerList');
+  list.innerHTML=questions.map((q,i)=>`
+    <div class="ans-row">
+      <div class="ans-q">${String(i+1).padStart(2,'0')}. ${q}</div>
+      <div>
+        <div class="ans-val" id="av${i}" onclick="editAns(${i})" style="cursor:pointer;padding:6px 8px;border-radius:6px;transition:background .15s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background=''">${answers[i]||'—'}</div>
+        <div class="confidence"><span class="conf-bar" style="width:${60+Math.floor(Math.random()*35)}px"></span><span>${Math.floor(78+Math.random()*20)}% confidence</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editAns(i){
+  const el=document.getElementById('av'+i);
+  const cur=answers[i]||'';
+  el.outerHTML=`<textarea class="ans-edit" id="ae${i}" rows="3" onblur="saveAns(${i})" onkeydown="if(event.key==='Escape')cancelAns(${i},\`${cur.replace(/`/g,'\\`')}\`)">${cur}</textarea>`;
+  document.getElementById('ae'+i).focus();
+}
+function saveAns(i){
+  const el=document.getElementById('ae'+i);
+  if(el){answers[i]=el.value;renderAnswers();}
+}
+function cancelAns(i,orig){answers[i]=orig;renderAnswers();}
+
+function exportExcel(){
+  showNotify('✓ Exported & saved to database successfully');
+  setStep(4);
+}
+
+function renderJobs(){
+  const list=document.getElementById('jobList');
+  const icons={Excel:'📊',PDF:'📄',Word:'📝',CSV:'📋'};
+  const filtered=JOBS.filter(j=>currentJobFilter==='all'||
+    (currentJobFilter==='done'&&j.status==='done')||
+    (currentJobFilter==='running'&&j.status==='running')||
+    (currentJobFilter==='failed'&&j.status==='failed'));
+  list.innerHTML=filtered.map(j=>`
+    <div class="job-card" onclick="openDetail(${j.id})">
+      <div class="job-icon" style="background:${j.status==='done'?'var(--green-bg)':j.status==='running'?'var(--accent-bg)':'var(--red-bg)'}">${icons[j.type]||'📄'}</div>
+      <div class="job-info">
+        <div class="job-name">${j.name}</div>
+        <div class="job-meta">${j.type} · ${j.size} · ${j.pages} pages · Updated ${j.updated}</div>
+      </div>
+      <div style="text-align:right;min-width:120px">
+        <span class="badge ${j.status==='done'?'badge-green':j.status==='running'?'badge-blue':'badge-red'}">
+          ${j.status==='done'?'● Complete':j.status==='running'?'◌ Running':'✕ Failed'}
+        </span>
+        <div class="job-prog">
+          <div class="text-sm text-muted" style="text-align:right;margin-top:6px">${j.progress}%</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${j.progress}%;background:${j.status==='done'?'var(--green)':j.status==='running'?'var(--accent)':'var(--red)'}"></div></div>
+        </div>
+      </div>
+      <div style="text-align:right;min-width:80px">
+        <div class="text-sm text-muted">Questions</div>
+        <div class="fw-500">${j.questions}</div>
+        <div class="text-sm text-muted" style="margin-top:4px">Answers</div>
+        <div class="fw-500" style="color:${j.answers===j.questions?'var(--green)':'var(--amber)'}">${j.answers}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterJobs(f){
+  currentJobFilter=f;
+  document.querySelectorAll('#pageJobs .btn').forEach(b=>b.classList.remove('btn-blue'));
+  document.getElementById('filter'+f.charAt(0).toUpperCase()+f.slice(1)).classList.add('btn-blue');
+  renderJobs();
+}
+
+function openDetail(id){
+  const j=JOBS.find(x=>x.id===id);
+  if(!j) return;
+  const icons={Excel:'📊',PDF:'📄',Word:'📝',CSV:'📋'};
+  const statusBadge=j.status==='done'?'<span class="badge badge-green">● Complete</span>':j.status==='running'?'<span class="badge badge-blue">◌ Processing</span>':'<span class="badge badge-red">✕ Failed</span>';
+  
+  document.getElementById('detailContent').innerHTML=`
+    <div class="detail-header">
+      <div class="detail-icon" style="background:${j.status==='done'?'var(--green-bg)':j.status==='running'?'var(--accent-bg)':'var(--red-bg)'};font-size:26px">${icons[j.type]||'📄'}</div>
+      <div style="flex:1">
+        <div class="detail-title">${j.name}</div>
+        <div class="detail-meta">
+          ${statusBadge}
+          <span class="meta-item">📅 Created ${j.created}</span>
+          <span class="meta-item">🕐 Updated ${j.updated}</span>
+          <span class="meta-item">📦 ${j.size}</span>
+        </div>
+      </div>
+      ${j.status==='done'||j.status==='failed'?`<button class="btn btn-blue" onclick="restartJob(${j.id})">↺ Restart Process</button>`:''}
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item"><div class="info-key">Document Type</div><div class="info-val">${j.type}</div></div>
+      <div class="info-item"><div class="info-key">System</div><div class="info-val" style="color:var(--accent)">${j.system}</div></div>
+      <div class="info-item"><div class="info-key">Questions Found</div><div class="info-val">${j.questions}</div></div>
+      <div class="info-item"><div class="info-key">Answers Extracted</div><div class="info-val" style="color:${j.answers===j.questions?'var(--green)':'var(--amber)'}">${j.answers} / ${j.questions}</div></div>
+      <div class="info-item"><div class="info-key">Pages</div><div class="info-val">${j.pages}</div></div>
+      <div class="info-item"><div class="info-key">File Size</div><div class="info-val">${j.size}</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card">
+        <div class="fw-500 mb-16">Processing Timeline</div>
+        <div class="timeline">
+          ${j.timeline.map(t=>`
+            <div class="tl-item">
+              <div class="tl-dot ${t.done?'done':'pending'}"></div>
+              <div class="tl-title">${t.title}</div>
+              <div class="tl-time">${t.time}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="fw-500 mb-16">Chat with Document</div>
+        <div class="chat-wrap" style="height:320px">
+          <div class="chat-msgs" id="chatMsgs${j.id}">
+            <div><div class="msg-label text-muted">AI Assistant</div><div class="msg msg-ai">Hello! I've processed <strong>${j.name}</strong>. Ask me anything about its contents.</div></div>
+          </div>
+          <div class="chat-input-row">
+            <input class="chat-input" id="chatIn${j.id}" placeholder="Ask about this document…" onkeydown="if(event.key==='Enter')sendChat(${j.id})">
+            <button class="btn btn-blue btn-sm" onclick="sendChat(${j.id})">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  nav('detail');
+}
+
+const chatResponses=[
+  "Based on the document, the key finding is that revenue increased by 23.4% year-over-year, driven by new enterprise contracts signed in Q3.",
+  "The document indicates a net profit margin of 18.7%, which is above the industry benchmark of 15%.",
+  "According to the analysis, three departments exceeded their budgets: R&D (+14.2%), Sales (+11.8%), and Marketing (+3.1%).",
+  "The compliance checklist shows 24 out of 24 items are satisfied. No critical gaps were identified.",
+  "The vendor contract includes a 2-year term with auto-renewal, subject to 90 days notice of termination.",
+];
+let chatIdx=0;
+
+function sendChat(id){
+  const inp=document.getElementById('chatIn'+id);
+  const msgs=document.getElementById('chatMsgs'+id);
+  if(!inp||!inp.value.trim()) return;
+  const userMsg=inp.value; inp.value='';
+  msgs.innerHTML+=`<div style="text-align:right"><div class="msg-label text-muted" style="text-align:right">You</div><div class="msg msg-user">${userMsg}</div></div>`;
+  msgs.innerHTML+=`<div><div class="msg-label text-muted">AI Assistant</div><div class="msg msg-ai"><span class="spinner"></span></div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    const allMsgs=msgs.querySelectorAll('.msg-ai');
+    const last=allMsgs[allMsgs.length-1];
+    if(last) last.innerHTML=chatResponses[chatIdx%chatResponses.length];
+    chatIdx++;msgs.scrollTop=msgs.scrollHeight;
+  },900);
+}
+
+function restartJob(id){
+  const j=JOBS.find(x=>x.id===id);
+  if(!j) return;
+  j.status='running';j.progress=10;j.answers=0;j.updated='just now';
+  showNotify('↺ Job restarted — queued for processing');
+  openDetail(id);
+}
+
+function openNewJobModal(){document.getElementById('newJobModal').classList.add('open');document.getElementById('newJobName').focus();}
+function createJob(){
+  const name=document.getElementById('newJobName').value.trim();
+  if(!name){document.getElementById('newJobName').style.borderColor='var(--red)';return;}
+  JOBS.unshift({id:JOBS.length+1,name,type:document.getElementById('newJobType').value.split(' ')[0],status:'running',progress:0,questions:0,answers:0,size:'—',created:'May 24, 2026',updated:'just now',pages:'—',system:'Pending',timeline:[{title:'Uploaded',time:'Just now',done:true},{title:'Text extraction',time:'Queued',done:false},{title:'Question identification',time:'Pending',done:false},{title:'RAG query',time:'Pending',done:false},{title:'Export',time:'Pending',done:false}]});
+  closeModal('newJobModal');renderJobs();
+  showNotify('✓ Job created and queued for processing');
+  document.getElementById('newJobName').value='';
+}
+
+function showNotify(msg){
+  const n=document.getElementById('notify');n.textContent=msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+renderJobs();
+</script>
+</body>
+</html>
